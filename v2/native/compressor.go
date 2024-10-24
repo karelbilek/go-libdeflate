@@ -60,10 +60,12 @@ func (c *Compressor) Compress(in, out []byte, f compress) (int, []byte, error) {
 	if err == errorShortBuffer { // if still doesn't fit (shouldn't happen at all)
 		out = make([]byte, 1000+len(in)*2)
 		n, _, _ := c.compress(in, out, f)
-		return n, out[:n], errors.New("libdeflate: native: compressed data is much larger than uncompressed")
+		out = append([]byte{}, out[:n]...)
+		return n, out, errors.New("libdeflate: native: compressed data is much larger than uncompressed")
 	}
 
-	return n, out[:n], nil
+	out = append([]byte{}, out[:n]...)
+	return n, out, nil
 }
 
 func (c *Compressor) compress(in, out []byte, f compress) (int, []byte, error) {
